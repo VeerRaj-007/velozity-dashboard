@@ -52,7 +52,7 @@ automatic reconnection/fallback for free. Raw WebSocket would mean
 hand-rolling both.
 
 **Job scheduler: node-cron over Bull.** The overdue sweep has no payload,
-no retries, no backoff, and nothing to queue — it's one periodic `UPDATE ...
+no retries, no backoff, and nothing to queue it's one periodic `UPDATE ...
 WHERE dueDate < now()`. Bull's Redis-backed queue is built for jobs with
 per-item state and failure handling; adding it here would be infrastructure
 for a job that doesn't need any.
@@ -111,7 +111,7 @@ The hardest part was making the real-time feed role-filtered without
 duplicating that filtering logic in two places. The fix was to push all of
 it into socket room membership at connect time an Admin's socket joins a
 `global` room, a PM's joins one room per project they manage, a Developer's
-joins a personal `user:<id>` room — so the activity service just emits each
+joins a personal `user:<id>` room so the activity service just emits each
 event to the `project:<id>` and `user:<id>` rooms it's relevant to, plus
 `global`, and never has to know who's allowed to see what. Access can't be
 gamed from the client because room membership is derived from the verified
@@ -119,6 +119,6 @@ JWT server-side, not from anything the socket claims. Missed-event catchup
 reads the same `TaskActivity` table the live feed writes to, so a
 reconnecting user's "last 20" is never out of sync with what live viewers
 saw. If I did it differently, I'd add a `ProjectMember` join table now
-rather than later — Developers currently get room access by "has a task in
+rather than later Developers currently get room access by "has a task in
 this project," which works for the spec but won't scale cleanly to features
 like project-level chat or multiple non-assignee viewers.
