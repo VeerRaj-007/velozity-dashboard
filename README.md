@@ -11,7 +11,7 @@ Developer), live task activity feed, and notifications.
 - **Real-time:** Socket.io
 - **Background jobs:** node-cron
 
-## Local Setup (Docker — recommended)
+## Local Setup (Docker: recommended)
 
 ```bash
 cp backend/.env.example backend/.env
@@ -45,19 +45,19 @@ npm run dev          # http://localhost:5173
 
 ## Architecture Decisions
 
-**WebSocket library — Socket.io over raw `ws`.** Rooms are the entire
+**WebSocket library: Socket.io over raw `ws`.** Rooms are the entire
 mechanism the role-filtered feed relies on (`global`, `project:<id>`,
 `user:<id>`), and Socket.io gives per-connection room membership plus
 automatic reconnection/fallback for free. Raw WebSocket would mean
 hand-rolling both.
 
-**Job scheduler — node-cron over Bull.** The overdue sweep has no payload,
+**Job scheduler: node-cron over Bull.** The overdue sweep has no payload,
 no retries, no backoff, and nothing to queue — it's one periodic `UPDATE ...
 WHERE dueDate < now()`. Bull's Redis-backed queue is built for jobs with
 per-item state and failure handling; adding it here would be infrastructure
 for a job that doesn't need any.
 
-**Token storage — access token in memory (React state/module var), refresh
+**Token storage: access token in memory (React state/module var), refresh
 token in an HttpOnly cookie.** Neither is ever placed in
 `localStorage`/`sessionStorage`, so an XSS payload can't read either token
 directly. `/api/auth/refresh` is scoped to the `/api/auth` cookie path.
@@ -89,10 +89,10 @@ isRead)` (the bell always asks "unread for this user" first).
 
 ## Known Limitations
 
-- No automated test suite — given the timeline, testing effort went into
+- No automated test suite given the timeline, testing effort went into
   manually verifying the auth/role boundary and the real-time fan-out
   instead.
-- Frontend styling is functional, not polished — inline styles, no design
+- Frontend styling is functional, not polished inline styles, no design
   system. All required screens and interactions are present.
 - No password-reset or user-invite flow; users are created only via the seed
   script (an Admin "create user" endpoint would be the next thing to add).
@@ -102,14 +102,14 @@ isRead)` (the bell always asks "unread for this user" first).
   `binaries.prisma.sh` to download its query-engine binary. That domain was
   blocked in the sandbox this was built in, so the Prisma-derived types
   (`Role`, `TaskStatus`, etc.) couldn't be fully typechecked in that
-  environment — they resolve normally on a machine with standard internet
+  environment they resolve normally on a machine with standard internet
   access, which is what `docker compose up` assumes.
 
 ## Explanation (for the submission form)
 
 The hardest part was making the real-time feed role-filtered without
 duplicating that filtering logic in two places. The fix was to push all of
-it into socket room membership at connect time — an Admin's socket joins a
+it into socket room membership at connect time an Admin's socket joins a
 `global` room, a PM's joins one room per project they manage, a Developer's
 joins a personal `user:<id>` room — so the activity service just emits each
 event to the `project:<id>` and `user:<id>` rooms it's relevant to, plus
